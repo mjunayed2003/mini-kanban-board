@@ -1,73 +1,48 @@
-version: "3.9"
+version: '3.8'
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: kanban_postgres
-    restart: unless-stopped
+    restart: always
     environment:
-      POSTGRES_USER: kanban
-      POSTGRES_PASSWORD: kanban123
-      POSTGRES_DB: kanban_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kanban
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kanban_user -d kanban_db"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - kanban_network
 
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    container_name: kanban_backend
-    restart: unless-stopped
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/kanban?schema=public
+      JWT_SECRET: your-super-secret-key-change-this-in-production
+      PORT: 4000
+    ports:
+      - '4000:4000'
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://kanban:kanban123@postgres:5432/kanban_db?schema=public
-      JWT_SECRET: ABC_123_xyz_abc_123
-      JWT_EXPIRES_IN: 1d
-      PORT: 4000
-      NODE_ENV: development
-    ports:
-      - "4000:4000"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:dev"
-    networks:
-      - kanban_network
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    container_name: kanban_frontend
-    restart: unless-stopped
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+    ports:
+      - '3000:3000'
     depends_on:
       - backend
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
-    command: npm run dev
-    networks:
-      - kanban_network
 
 volumes:
   postgres_data:
-
-networks:
-  kanban_network:
-    driver: bridge
