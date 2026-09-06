@@ -64,18 +64,34 @@ export class BoardsService {
   }
 
   async addMember(boardId: string, dto: AddMemberDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const board = await this.prisma.board.findUnique({
+      where: { id: boardId },
+      select: { id: true, ownerId: true },
     });
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    const trimmedEmail = dto.email.trim();
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: trimmedEmail, mode: 'insensitive' } },
+    });
+
     if (!user) {
-      throw new NotFoundException('No user found with this email');
+      throw new NotFoundException(
+        `No registered user found with "${trimmedEmail}". They must register an account first.`,
+      );
+    }
+
+    if (board.ownerId === user.id) {
+      throw new ConflictException('This user is already the owner of this board.');
     }
 
     const existing = await this.prisma.boardMember.findUnique({
       where: { boardId_userId: { boardId, userId: user.id } },
     });
     if (existing) {
-      throw new ConflictException('User is already a member of this board');
+      throw new ConflictException('This user is already a member of this board.');
     }
 
     return this.prisma.boardMember.create({
