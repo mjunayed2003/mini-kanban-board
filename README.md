@@ -30,6 +30,7 @@ A high-performance, modern full-stack Kanban application designed for seamless t
   - [Prerequisites](#prerequisites)
   - [Option 1: Run with Docker Compose (Recommended)](#option-1-run-with-docker-compose-recommended)
   - [Option 2: Manual Local Setup](#option-2-manual-local-setup)
+  - [First Step: Register via Swagger](#first-step-register-via-swagger)
 - [Environment Variables](#-environment-variables)
 - [API Reference & Documentation](#-api-reference--documentation)
 - [Core Engineering Highlights](#-core-engineering-highlights)
@@ -353,6 +354,30 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+### 🎯 First Step: Register via Swagger
+
+Before logging into the frontend or making authenticated requests, register your primary account using the built-in **Swagger UI**:
+
+1. **Open Swagger Explorer**:
+   Navigate to [`http://localhost:4000/api/docs`](http://localhost:4000/api/docs) *(or `http://localhost:5000/api/docs` if using local port 5000)*.
+2. **Locate Registration Endpoint**:
+   Under the **auth** group, expand **`POST /api/auth/register`**.
+3. **Submit User Details**:
+   Click **"Try it out"**, enter your details, and click **"Execute"**:
+   ```json
+   {
+     "name": "Jane Doe",
+     "email": "jane@example.com",
+     "password": "password123"
+   }
+   ```
+4. **Authorize Swagger (Optional for Testing Endpoints)**:
+   Copy the `accessToken` string from the JSON response. Click the green **Authorize 🔓** button at the top right of the Swagger UI, paste the token, and click **Authorize**. You are now authorized to test any protected endpoints (`/boards`, `/columns`, `/tasks`) directly from Swagger!
+5. **Sign in to Frontend**:
+   Now visit [`http://localhost:3000/login`](http://localhost:3000/login) in your browser, log in with your new email and password, and start managing your Kanban boards!
+
+---
+
 ## ⚙️ Environment Variables
 
 ### Backend (`backend/.env`)
@@ -374,7 +399,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📖 API Reference & Documentation
 
-Interactive OpenAPI documentation is generated automatically by NestJS Swagger. Visit `http://localhost:4000/api/docs` to test endpoints directly.
+Interactive OpenAPI documentation is generated automatically by NestJS Swagger.
+👉 **Swagger UI**: Visit [`http://localhost:4000/api/docs`](http://localhost:4000/api/docs) *(or port `5000` if configured)* to explore and test all endpoints.
+
+> [!TIP]
+> **Getting Started via Swagger**: To begin testing, start by calling **`POST /api/auth/register`** in Swagger to create your first user account. Copy the resulting `accessToken` and click the green **Authorize 🔓** button at the top right of Swagger to unlock all protected routes (`/boards`, `/columns`, `/tasks`).
 
 ### 🔑 Authentication Module (`/api/auth`)
 

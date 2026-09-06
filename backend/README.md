@@ -50,6 +50,9 @@ Server will be running at `http://localhost:5000` (or your configured `PORT`).
 Interactive Swagger / OpenAPI docs are available at:
 👉 **`http://localhost:5000/api/docs`** (or `http://localhost:4000/api/docs` in Docker)
 
+> [!TIP]
+> **First Step**: Go to `POST /api/auth/register` in Swagger to create your first user account, copy the returned `accessToken`, and use Swagger's **Authorize** button to test authenticated routes!
+
 ---
 
 ## 🏗️ Modules Architecture
