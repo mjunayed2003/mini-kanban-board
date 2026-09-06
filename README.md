@@ -262,8 +262,17 @@ git clone https://github.com/mjunayed2003/mini-kanban-board.git
 cd mini-kanban-board
 
 # 2. Launch all services
+# Foreground mode (shows live console logs):
 docker compose up --build
+
+# OR Detached mode (runs in background, keeps terminal free):
+docker compose up -d --build
 ```
+
+> [!TIP]
+> **Detached Mode (`-d`)**: Running `docker compose up -d` executes containers in the background. To ensure new code changes are built and applied, it is recommended to run `docker compose up -d --build`.
+> - **View live logs**: `docker compose logs -f` (or specifically for backend: `docker compose logs -f backend`)
+> - **Check container status**: `docker compose ps`
 
 Once built, services will be accessible at:
 - 🌐 **Frontend Application**: [http://localhost:3000](http://localhost:3000)
@@ -494,7 +503,9 @@ pnpm run lint
 ### Root Directory
 | Command | Description |
 | :--- | :--- |
-| `docker compose up --build` | Builds and starts Postgres, Backend, and Frontend containers |
+| `docker compose up --build` | Builds and starts containers with live foreground output |
+| `docker compose up -d --build` | Builds and starts containers in detached (background) mode |
+| `docker compose logs -f` | View live follow logs from background containers |
 | `docker compose down` | Stops and removes all running containers and networks |
 
 ### Backend (`/backend`)

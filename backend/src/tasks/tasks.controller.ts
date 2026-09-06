@@ -49,7 +49,7 @@ export class TasksController {
     return this.tasksService.remove(taskId);
   }
 
-  // Day 3-এর মূল endpoint
+  // Move task endpoint
   @UseGuards(BoardAccessGuard)
   @ResourceType('task')
   @Post(':taskId/move')
