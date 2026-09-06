@@ -112,7 +112,7 @@ export const addBoardMember = createAsyncThunk(
   async ({ boardId, email }: { boardId: string; email: string }, { dispatch, rejectWithValue }) => {
     try {
       await api.post(`/boards/${boardId}/members`, { email });
-      dispatch(fetchBoardDetails(boardId));
+      await dispatch(fetchBoardDetails(boardId));
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || 'Failed to add member');
     }
