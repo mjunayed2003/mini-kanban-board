@@ -30,12 +30,12 @@ export class BoardAccessGuard implements CanActivate {
     const userId: string = req.user?.id;
 
     const paramKey = `${resourceType}Id`;
-    // Checks req.params first, with fallback to req.body (useful for create endpoints like POST /columns)
+
     const resourceId: string = req.params?.[paramKey] ?? req.body?.[paramKey];
 
     if (!resourceId) {
       throw new NotFoundException(
-        `Missing "${paramKey}" (param বা body-তে দিতে হবে)`,
+        `Missing "${paramKey}" (param)`,
       );
     }
 

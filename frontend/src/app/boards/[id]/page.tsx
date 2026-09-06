@@ -75,7 +75,6 @@ export default function BoardDetailPage({ params }: { params: Promise<{ id: stri
     const sourceColumn = findColumnOfTask(activeTaskId);
     if (!sourceColumn) return;
 
-    // over can be another task, or an empty column
     const overColumn =
       columns.find((c) => c.id === overId) || findColumnOfTask(overId);
     if (!overColumn) return;
@@ -87,7 +86,6 @@ export default function BoardDetailPage({ params }: { params: Promise<{ id: stri
     const afterTask =
       overIndex >= 0 ? overTasks[overIndex] : overTasks[overTasks.length - 1] || null;
 
-    // Optimistic UI update in Redux store
     const nextColumns: Column[] = columns.map((c) => ({
       ...c,
       tasks: [...c.tasks],
@@ -101,7 +99,6 @@ export default function BoardDetailPage({ params }: { params: Promise<{ id: stri
 
     dispatch(setColumns(nextColumns));
 
-    // Persist to backend via Redux Thunk
     dispatch(
       moveTask({
         taskId: activeTaskId,

@@ -21,7 +21,7 @@ import { ReorderColumnsDto } from './dto/reorder-columns.dto.js';
 export class ColumnsController {
   constructor(private columnsService: ColumnsService) {}
 
-  // boardId body-তে আসে, তাই ResourceType('board') — guard body fallback দিয়ে চেক করবে
+
   @UseGuards(BoardAccessGuard)
   @ResourceType('board')
   @Post()
@@ -36,7 +36,6 @@ export class ColumnsController {
     return this.columnsService.findAllByBoard(boardId);
   }
 
-  // reorder-এ boardId body-তে থাকবে — @Patch(':columnId') এর আগেই সংজ্ঞায়িত করতে হবে
   @UseGuards(BoardAccessGuard)
   @ResourceType('board')
   @Patch('reorder')

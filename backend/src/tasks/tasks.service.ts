@@ -9,7 +9,7 @@ import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { MoveTaskDto } from './dto/move-task.dto.js';
 
 const POSITION_GAP = 1000;
-const MIN_GAP = 1; // এর চেয়ে ছোট gap হলে reindex ট্রিগার হবে
+const MIN_GAP = 1; 
 
 @Injectable()
 export class TasksService {
@@ -50,10 +50,7 @@ export class TasksService {
     return this.prisma.task.delete({ where: { id: taskId } });
   }
 
-  /**
-   * Move a task — একই column-এ reorder অথবা অন্য column-এ move, দুটোই handle করে।
-   * পুরো লজিক একটা transaction-এর ভিতরে, যাতে concurrent move-এ conflict না হয়।
-   */
+
   async moveTask(taskId: string, dto: MoveTaskDto) {
     return this.prisma.$transaction(async (tx: any) => {
       const task = await tx.task.findUnique({
@@ -70,26 +67,21 @@ export class TasksService {
         throw new NotFoundException('Target column not found');
       }
 
-      // Security check: guard শুধু source task-এর board access verify করে।
-      // target column অন্য কোনো board-এর হলে সেটা আটকাতে হবে এখানে manually।
+
       if (targetColumn.boardId !== task.column.boardId) {
         throw new ForbiddenException(
           'Cannot move a task to a column on a different board',
         );
       }
 
-      // Step 1: neighbour resolve করা (before/after task, দুইভাবে হতে পারে)
       let { before, after } = await this.resolveNeighbours(
         tx,
         taskId,
         dto,
       );
 
-      // Step 2: position calculate করা
       let newPosition = this.calculatePosition(before, after);
 
-      // Step 3: gap খুব ছোট হয়ে গেলে (precision safeguard) — পুরো target column
-      // reindex করে fresh gap বানিয়ে আবার calculate করা হবে
       const gapTooSmall =
         (before && Math.abs(newPosition - before.position) < MIN_GAP) ||
         (after && Math.abs(after.position - newPosition) < MIN_GAP);
@@ -100,7 +92,6 @@ export class TasksService {
         newPosition = this.calculatePosition(before, after);
       }
 
-      // Step 4: task update — column change + নতুন position
       return tx.task.update({
         where: { id: taskId },
         data: {
@@ -111,8 +102,6 @@ export class TasksService {
     });
   }
 
-  // before/after task বের করে — হয় সরাসরি beforeTaskId/afterTaskId থেকে,
-  // অথবা targetPosition (index) থেকে target column-এর বর্তমান order দেখে
   private async resolveNeighbours(
     tx: any,
     taskId: string,
@@ -153,7 +142,7 @@ export class TasksService {
       select: { id: true, position: true },
     });
 
-    const index = dto.targetPosition ?? siblings.length; // না দিলে শেষে বসবে
+    const index = dto.targetPosition ?? siblings.length;
     const before = index > 0 ? (siblings[index - 1] ?? null) : null;
     const after = siblings[index] ?? null;
 
@@ -173,10 +162,9 @@ export class TasksService {
     if (!before && after) {
       return after.position / 2;
     }
-    return POSITION_GAP; // column খালি
+    return POSITION_GAP;
   }
 
-  // Column-এর সব task (excludeTaskId বাদে) নতুন করে 1000, 2000, 3000... করে দেয়
   private async reindexColumn(
     tx: any,
     columnId: string,

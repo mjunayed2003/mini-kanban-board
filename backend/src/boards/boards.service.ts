@@ -21,7 +21,6 @@ export class BoardsService {
     });
   }
 
-  // user যেসব board-এর owner অথবা member — দুটোই লিস্ট করবে
   findAllForUser(userId: string) {
     return this.prisma.board.findMany({
       where: {

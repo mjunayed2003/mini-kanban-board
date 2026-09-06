@@ -10,7 +10,6 @@ export class ReorderColumnsDto {
   @IsUUID()
   boardId: string;
 
-  // frontend থেকে drag করার পর নতুন order-এ columnId এর array আসবে
   @ValidateNested({ each: true })
   @Type(() => ColumnOrderItem)
   @ArrayMinSize(1)

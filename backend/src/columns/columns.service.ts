@@ -9,7 +9,7 @@ export class ColumnsService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateColumnDto) {
-    // নতুন column সবসময় শেষে বসবে — বর্তমান সর্বোচ্চ position + 1000
+
     const last = await this.prisma.column.findFirst({
       where: { boardId: dto.boardId },
       orderBy: { position: 'desc' },
@@ -49,7 +49,6 @@ export class ColumnsService {
     return this.prisma.column.delete({ where: { id: columnId } });
   }
 
-  // পুরো board-এর column গুলো নতুন order অনুযায়ী re-position করে দেয়
   async reorder(dto: ReorderColumnsDto) {
     const updates = dto.orderedColumns.map((item, index) =>
       this.prisma.column.update({
