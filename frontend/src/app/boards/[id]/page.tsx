@@ -20,7 +20,6 @@ import {
   fetchBoardDetails,
   addColumn,
   moveTask,
-  addBoardMember,
   setColumns,
 } from '@/store/slices/boardSlice';
 
@@ -36,8 +35,6 @@ export default function BoardDetailPage({ params }: { params: Promise<{ id: stri
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [newColTitle, setNewColTitle] = useState('');
-  const [memberEmail, setMemberEmail] = useState('');
-  const [isAddingMember, setIsAddingMember] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -117,19 +114,7 @@ export default function BoardDetailPage({ params }: { params: Promise<{ id: stri
     setNewColTitle('');
   };
 
-  const handleAddMember = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!memberEmail.trim()) return;
-    try {
-      setIsAddingMember(true);
-      await dispatch(addBoardMember({ boardId: id, email: memberEmail.trim() })).unwrap();
-      setMemberEmail('');
-    } catch (err: any) {
-      alert(err || 'Failed to add member');
-    } finally {
-      setIsAddingMember(false);
-    }
-  };
+
 
   if (authLoading || (!currentBoard && boardLoading)) {
     return (
@@ -172,39 +157,6 @@ export default function BoardDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
 
-        {/* Member Management */}
-        <div className="flex items-center gap-3">
-          {currentBoard.members.length > 0 && (
-            <div className="flex items-center -space-x-1.5 overflow-hidden">
-              {currentBoard.members.map((m) => (
-                <div
-                  key={m.id}
-                  title={`${m.user.name} (${m.user.email}) - ${m.role}`}
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-800 font-semibold text-xs ring-2 ring-white"
-                >
-                  {m.user.name.charAt(0).toUpperCase()}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <form onSubmit={handleAddMember} className="flex gap-1.5">
-            <input
-              type="email"
-              value={memberEmail}
-              onChange={(e) => setMemberEmail(e.target.value)}
-              placeholder="Invite user by email..."
-              className="border border-gray-300 rounded-lg px-3 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              disabled={isAddingMember}
-              className="bg-gray-900 hover:bg-gray-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-            >
-              {isAddingMember ? 'Inviting...' : 'Invite'}
-            </button>
-          </form>
-        </div>
       </header>
 
       {/* Kanban Board Board Area */}
